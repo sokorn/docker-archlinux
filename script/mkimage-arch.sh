@@ -59,10 +59,11 @@ EOF
 touch $ROOTFS/etc/resolv.conf
 
 arch-chroot $ROOTFS /bin/sh -c "haveged -w 1024; pacman-key --init; pkill haveged; pacman -Rs --noconfirm haveged; pacman-key --populate archlinux"
-arch-chroot $ROOTFS /bin/sh -c "ln -s /usr/share/zoneinfo/UTC /etc/localtime"
-echo 'en_US.UTF-8 UTF-8' > $ROOTFS/etc/locale.gen
+arch-chroot $ROOTFS /bin/sh -c "ln -s usr/share/zoneinfo/Europe/Berlin /etc/localtime"
+echo 'de_DE.UTF-8 UTF-8' > $ROOTFS/etc/locale.gen
 arch-chroot $ROOTFS locale-gen
-arch-chroot $ROOTFS /bin/sh -c 'echo "Server = https://mirrors.kernel.org/archlinux/\$repo/os/\$arch" > /etc/pacman.d/mirrorlist'
+arch-chroot $ROOTFS /bin/sh -c 'curl "https://www.archlinux.org/mirrorlist/?country=all&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" > /etc/pacman.d/mirrorlist'
+arch-chroot $ROOTFS /bin/sh -c 'sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist'
 
 # udev doesn't work in containers, rebuild /dev
 DEV=$ROOTFS/dev
