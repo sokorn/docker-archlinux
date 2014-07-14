@@ -27,10 +27,7 @@ for sys in $(awk '!/^#/ { if ($4 == 1) print $1 }' /proc/cgroups); do
 done
 )
 
-ROOTFS=$(mktemp -d /tmp/rootfs-archlinux-XXXXXXXXXX)
-chmod 755 $ROOTFS
-
-arch-chroot $ROOTFS /bin/sh -c 'sed 's/^CheckSpace/#CheckSpace/g' -i /etc/pacman.conf'
+sed 's/^CheckSpace/#CheckSpace/g' -i /etc/pacman.conf
 
 pacman -Syy && pacman -Syu --noconfirm
 pacman -S --noconfirm --needed arch-install-scripts expect tar base-devel docker lxc
@@ -39,6 +36,9 @@ pacman -S --noconfirm --needed arch-install-scripts expect tar base-devel docker
 mkdir /var/lib/docker
 docker -d -s vfs 0<&- &>/dev/null &
 #nohup /opt/mkimage/wrapdocker 0<&- &>/dev/null &
+
+ROOTFS=$(mktemp -d /tmp/rootfs-archlinux-XXXXXXXXXX)
+chmod 755 $ROOTFS
 
 # packages to ignore for space savings
 PKGIGNORE=linux,jfsutils,lvm2,cryptsetup,groff,man-db,man-pages,mdadm,pciutils,pcmciautils,reiserfsprogs,s-nail,xfsprogs
